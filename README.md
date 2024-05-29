@@ -73,6 +73,9 @@ Scripts synced from Jamf to Disk will be placed in additional subdirectories acc
 ```
 Currently there is only very basic type-checking of the fields, so incorrect values for fields like "priority" are likely to cause issues.
 
+Optionally, a matching Markdown (`.md`) file may be included with notes, todos, or other information about the script.  Currently, nothing is done with
+this file, but it is possible we do something with it in the future.  (We may decide to read this into the "Notes" field, for example.)
+
 ### Other subdirectories
 As additional Jamf modules are included, subdirectories for each module will be added.
 
