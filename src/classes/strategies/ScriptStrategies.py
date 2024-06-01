@@ -52,6 +52,10 @@ class DummyScriptStrategy(ScriptStrategy):
     """
     Dummy strategy for testing
     """
+
+    # Static class vars
+    _strategy = "dummy"
+
     def load(self, script: Script):
         pass
     def save(self, script: Script):
@@ -59,6 +63,13 @@ class DummyScriptStrategy(ScriptStrategy):
 
 
 class DiskScriptStrategy(ScriptStrategy):
+    """
+    Concrete Strategy class to interface with files on disk
+
+    Attributes:
+        _strategy (str): Strategy being used.  We need this to chain other strategies
+        _disk (Disk): Disk instance to use
+    """
 
 
     # Static class vars
@@ -66,6 +77,12 @@ class DiskScriptStrategy(ScriptStrategy):
 
 
     def __init__(self, disk: Disk):
+        """
+        Class constructor
+
+        Args:
+            disk (Disk): Disk facade instance being used
+        """
         self._disk = disk
 
 
@@ -84,7 +101,7 @@ class JamfScriptStrategy(ScriptStrategy):
     Concrete Strategy class to interface with the Jamf API
 
     Attributes:
-        _location_type (str): Strategy being used.  We need this to chain other strategies
+        _strategy (str): Strategy being used.  We need this to chain other strategies
         _api (JamfApi): JamfApi instance to use
     """
 
@@ -98,7 +115,7 @@ class JamfScriptStrategy(ScriptStrategy):
         Class constructor
 
         Args:
-            location_type (str): Strategy being used.  Should = "jamf"
+            api (JamfApi): JamfApi facade instance being used
         """
         self._api = api
 
@@ -118,5 +135,14 @@ class JamfScriptStrategy(ScriptStrategy):
 
 
     def save(self, script: Script) -> Script:
+        """
+        Implementation of the Save method
+
+        Attributes:
+            script (Script): Script object to save.
+
+        Returns:
+            Script: The script object that has been saved to Jamf.  This may either be the original object (if updated) or a new object (if created)
+        """
         return self._api.saveScript(script)
 
