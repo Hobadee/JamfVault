@@ -41,7 +41,7 @@ class JamfBearerAuth(requests.auth.AuthBase):
     """ Get a token
     """
     def getToken(self):
-        url="/api/auth/tokens"
+        url="/api/v1/auth/token"
 
         rtn = requests.post(f'{self._server}{url}',
             auth=HTTPBasicAuth(self._username, self._password), headers={'Accept': 'application/json'})
