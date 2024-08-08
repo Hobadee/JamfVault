@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-class ExtensionAttribute:
+class Ea:
     """
     
     Notes:
@@ -15,6 +15,7 @@ class ExtensionAttribute:
 
     def __init__(self):
         self._eaId = None
+        self._eaType = None
         self._name = None
         self._enabled = None
         self._description = None
@@ -39,10 +40,15 @@ class ExtensionAttribute:
         self.description = json["description"]
         self.dataType = json["data_type"]
         self.inputType = json["input_type"]["type"]
-        self.inputPlatform = json["input_type"]["platform"]
-        self.inputScript = json["input_type"]["script"]
         self.inventoryDisplay = json["inventory_display"]
-        self.popupMenu = ExtensionAttributePopupsFactory.fromJson(json["input_type"]["popup_choices"])
+
+        # These may not exist - check for existence before setting
+        if "platform" in json["input_type"]:
+            self.inputPlatform = json["input_type"]["platform"]
+        if "script" in json["input_type"]:
+            self.inputScript = json["input_type"]["script"]
+        if "popup_choices" in json["input_type"]:
+            self.popupMenu = ExtensionAttributePopupsFactory.fromJson(json["input_type"]["popup_choices"])
 
         self.loadStatus = "json"
 
@@ -87,6 +93,11 @@ class ExtensionAttribute:
         to this rule is the "loadStatus" and load/save strategies; loadStatus will be "merge" and if the strategies of A
         and B don't match, they will be nulled.
         """
+        # First check if EA Types are the same.  If not, puke right now.
+        # If both types are set, check that they match.  Puke if they don't
+        if (self._eaType != None and other._eaType != None) and self._eaType != other._eaType:
+            raise TypeError("Extension Attribute types don't match!  Will not merge!")
+
         # Can we iterate all the variables?  Are there any we *woulnd't* want to iterate?
         # We may implement a "from" variable (from=Jamf) which we would want to exclude
         if not self._eaId:
@@ -132,6 +143,16 @@ class ExtensionAttribute:
             raise TypeError(f'eaId must be type "int"!')
         self._eaId = value
     eaId = property(get_eaId, set_eaId)
+
+
+    # Getter and Setter for eaType
+    def get_eaType(self) -> str:
+        return self._eaType
+    def set_eaType(self, value: str):
+        if not isinstance(value, (str, type(None))):
+            raise TypeError(f'eaType must be type "str"!')
+        self._eaType = value
+    eaType = property(get_eaType, set_eaType)
 
 
     # Getter and Setter for name
@@ -236,6 +257,7 @@ class ExtensionAttribute:
     def get_saveStrategy(self) -> str:
         return self._saveStrategy
     def set_saveStrategy(self, value):
+        raise NotImplementedError("Copied from Script.py - verify changes")
         # We need to lazy-load this.  Loading up top leads to a circular dependancy
         from src.classes.strategies.ScriptStrategies import ScriptStrategy
         if not isinstance(value, (ScriptStrategy, type(None))):

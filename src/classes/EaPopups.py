@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-class ExtensionAttributePopups:
+class EaPopups:
     """
     I'm not entirely sure I want this as it's own class right now.
 

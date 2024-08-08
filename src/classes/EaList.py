@@ -1,8 +1,10 @@
 from __future__ import annotations
 import copy
+from src.classes.ObjectList import ObjectList
+from src.classes.Ea import Ea
 
 
-class ExtensionAttributeList(ObjectList[ExtensionAttribute]):
+class EaList(ObjectList[Ea]):
     """
     Class to contain and handle multiple Extension Attributes
     """

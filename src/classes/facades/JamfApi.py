@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from src.factories.ScriptFactory import ScriptFactory
 from src.factories.ScriptListFactory import ScriptListFactory
+from src.factories.EaFactory import EaFactory
+from src.factories.EaListFactory import EaListFactory
+#from src.classes.Ea import Ea
+#from src.classes.EaList import EaList
 import datetime
 import json
 
@@ -77,7 +81,7 @@ class JamfApi:
         script = ScriptFactory.EmptyScript()
         script.scriptId = scriptId
 
-        return self.getScript(script)
+        script = self.getScript(script)
         return script
 
 
@@ -170,3 +174,158 @@ class JamfApi:
         method = 'POST'
         response = self._JAC.request(endpoint, method)
 
+
+    #
+    # Extension Attribute Functions
+    #
+
+    def getCeaList(self) -> EaList:
+        """
+        Gets a list of Computer Extension Attributes
+
+        This is a lazy-loader
+        
+        Returns:
+            ExtensionAttributeList: ExtensionAttribute list object
+        """
+        endpoint = f"/JSSResource/computerextensionattributes"
+        key = "computer_extension_attributes"
+        eaType = "computer"
+        return self._getEaList(endpoint=endpoint, key=key, eaType=eaType)
+    
+    def getMeaList(self) -> EaList:
+        """
+        Gets a list of Mobile Device Extension Attributes
+
+        This is a lazy-loader
+        
+        Returns:
+            ExtensionAttributeList: ExtensionAttribute list object
+        """
+        endpoint = f"/JSSResource/mobiledeviceextensionattributes"
+        key = "mobile_device_extension_attributes"
+        eaType = "mobile"
+        return self._getEaList(endpoint=endpoint, key=key, eaType=eaType)
+
+    def getUeaList(self) -> EaList:
+        """
+        Gets a list of User Extension Attributes
+
+        This is a lazy-loader
+
+        Returns:
+            ExtensionAttributeList: ExtensionAttribute list object
+        """
+        endpoint = f"/JSSResource/userextensionattributes"
+        key = "user_extension_attributes"
+        eaType = "user"
+        return self._getEaList(endpoint=endpoint, key=key, eaType=eaType)
+    
+    def _getEaList(self, endpoint: str, key: str, eaType: str) -> EaList:
+        """
+        Gets a list of Extension Attributes.  Can be either Computer, Mobile Device, or
+        user, depending on correct endpoint and key.
+
+        This is a lazy-loader
+
+        Args:
+            endpoint (str): API endpoint to hit
+            key (str): Results are wrapped in a dict key.  What is that key?
+            eaType (str): Type of EA List this is.  Should probably be an ENUM later
+
+        Returns:
+            ExtensionAttributeList: ExtensionAttribute list object
+        """
+        method = 'GET'
+        response = self._JAC.request(endpoint, method)
+
+        EaList = EaListFactory.EmptyEaList()
+
+        for item in response.json()[key]:
+            ea = EaFactory.BasicEa(eaid=item["id"], name=item["name"])
+            if hasattr(item, "enabled"):
+                ea.enabled = item["enabled"]
+            ea.eaType = eaType
+            EaList.add(ea)
+
+        return EaList
+
+
+    def getEa(self, Ea: Ea) -> Ea:
+        """
+        Gets a single Extension Attribute, by Ea reference
+
+        We should preserve the passed "Ea" reference here
+        so that we update it, rather than creating a new object
+
+        Args:
+            Ea (Ea): Extension Attribute object to get from Jamf
+
+        Returns:
+            Ea: Extension Attribute object
+        """
+        if not isinstance(Ea.eaId, int):
+            raise ValueError()
+    
+        match Ea.eaType:
+            case "computer":
+                endpoint = f"/JSSResource/computerextensionattributes/id/{Ea.eaId}"
+                key = "computer_extension_attribute"
+            case "mobile":
+                endpoint = f"/JSSResource/mobiledeviceextensionattributes/id/{Ea.eaId}"
+                # FIXME: WRONG KEY!
+                key = "computer_extension_attribute"
+            case "user":
+                # endpoint = f"/JSSResource/userextensionattributes/name/{Ea.name}"
+                endpoint = f"/JSSResource/userextensionattributes/id/{Ea.eaId}"
+                # FIXME: WRONG KEY!
+                key = "computer_extension_attribute"
+            case _:
+                raise ValueError(f"{Ea.eaType} isn't a valid type of Extension Attribute")
+            
+        method = 'GET'
+        response = self._JAC.request(endpoint, method)
+
+        Ea.from_json(response.json()[key])
+        Ea.loadStatus = "jamf"
+
+        return Ea
+    
+
+    def getEaById(self, eaId: int, eaType: str) -> Ea:
+        """
+        Gets a single Extension Attribute of Type, by ID
+
+        Args:
+            eaId (int): ID of the Jamf Extension Attribute to get
+            eaType (str): Type of EA to get.  (May be ENUM in future)
+
+        Returns:
+            Ea: Extension Attribute object
+        """
+        ea = EaFactory.EmptyEa()
+        ea.eaId = eaId
+
+        ea = self.getEa(ea)
+        return ea
+    
+
+    def saveEa(self, Ea: Ea) -> Ea:
+        """
+        If an EA has an ID, update that ID, otherwise create a new script
+
+        Should we try to match on name at all?
+
+        Args:
+            EaId (ExtensionAttribute): object to be updated or saved in Jamf
+        
+        Returns:
+            ExtensionAttribute: object that was saved to Jamf
+        """
+        raise NotImplementedError("JamfApi.saveEa not implemented yet!")
+    
+    def createEa(self) -> Ea:
+        raise NotImplementedError("JamfApi.createEa not implemented yet!")
+    
+    def updateEa(self) -> Ea:
+        raise NotImplementedError("JamfApi.updateEa not implemented yet!")
