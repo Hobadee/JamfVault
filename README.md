@@ -1,4 +1,4 @@
-# JamfSyncer
+# JamfVault
 This project helps sync Jamf items to a local repo, so they can be controlled with source-control, rather than in the Jamf UI without and SCM.
 
 The end-goal of this project is to allow any push to a repository managing Jamf scripts (or other supported objects) to automatically update Jamf.
