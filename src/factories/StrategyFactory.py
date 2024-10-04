@@ -4,7 +4,7 @@ from src.classes.strategies.ScriptStrategies import DiskScriptStrategy, JamfScri
 from src.classes.strategies.ScriptListStrategies import DiskScriptListStrategy, JamfScriptListStrategy
 
 from src.classes.strategies.EaStrategies import DiskEaStrategy, JamfEaStrategy
-#from src.classes.strategies.EaListStrategies import DiskEaStrategy, JamfEaStrategy
+from src.classes.strategies.EaListStrategies import DiskEaListStrategy, JamfEaListStrategy
 
 
 class StrategyFactory:
@@ -82,6 +82,37 @@ class StrategyFactory:
                 if not api:
                     raise ValueError("API connection must be provided for Jamf strategy")
                 return JamfEaStrategy(api)
+            case _:
+                raise ValueError(f"Unknown location type: {location_type}")
+
+
+    @staticmethod
+    def EaListStrategy(location_type: str, **kwargs) -> EaListStrategy:
+        """
+        Create an EaList strategy object for a given "location_type"
+
+        Args:
+            location_type (str): String representation of the location type.  Currently "disk" or "jamf"
+            EaType (str): String representation of the type of EA we are dealing with.  Currently "computer", "mobile", or "user"
+        
+        Returns:
+            EaListStrategy: Concrete implementation of EaListStrategy
+        """
+        EaType = kwargs.get('EaType')
+        if not EaType:
+            raise ValueError("EA type must be provided for any EA strategy")
+
+        match location_type:
+            case "disk":
+                disk = kwargs.get('disk')
+                if not disk:
+                    raise ValueError("Disk connection must be provided for Disk strategy")
+                return DiskEaListStrategy(disk, EaType)
+            case "jamf":
+                api = kwargs.get('api')
+                if not api:
+                    raise ValueError("API connection must be provided for Jamf strategy")
+                return JamfEaListStrategy(api, EaType)
             case _:
                 raise ValueError(f"Unknown location type: {location_type}")
 

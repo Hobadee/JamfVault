@@ -44,23 +44,31 @@ api = JamfApi(JAC)
 disk = Disk(path=diskdir)
 
 # Set up the Script strategies
+# We use these to work with individual scripts
 dss = StrategyFactory.ScriptStrategy("disk", disk=disk)
 jss = StrategyFactory.ScriptStrategy("jamf", api=api)
 
 # Set up the ScriptList strategies
+# We use these to work with multiple scripts at the same time
 dsls = StrategyFactory.ScriptListStrategy("disk", disk=disk)
 jsls = StrategyFactory.ScriptListStrategy("jamf", api=api)
+
 
 # Set up the EA strategies
 des = StrategyFactory.EaStrategy("disk", disk=disk)
 jes = StrategyFactory.EaStrategy("jamf", api=api)
+
+# Set up the EA List strategies
+# TODO: Finish EaListStrategy
+#dels = StrategyFactory.EaListStrategy("disk", disk=disk)
+#jels = StrategyFactory.EaListStrategy("jamf", api=api, type="")
 
 
 # These are all examples of how to do various basic sync's.
 # We recommend you first do a sync FROM Jamf TO Disk to populate
 # all your existing scripts, then you can begin syncing TO Jamf
 
-def JamfToDiskSingleFile(search):
+def ScriptsJamfToDiskSingleFile(search):
     # Syncs a single file from Jamf, to Disk
 
     # LazyLoad a list of all Scripts in Jamf (Just the id/name)
@@ -73,7 +81,7 @@ def JamfToDiskSingleFile(search):
     # Save all script details to Disk
     dss.save(s)
 
-def DiskToJamfSingleFile(search):
+def ScriptsDiskToJamfSingleFile(search):
     # Syncs a single file from Disk, to Jamf
 
     # Load all scripts from Disk
@@ -86,7 +94,7 @@ def DiskToJamfSingleFile(search):
     # Save the script to Jamf
     jss.save(s)
 
-def DiskToJamfAll():
+def ScriptsDiskToJamfAll():
     # Syncs ALL scripts from Disk to Jamf
 
     # Load all scripts from Disk
@@ -94,7 +102,7 @@ def DiskToJamfAll():
     # Save all scripts to Jamf
     jsls.save(sl)
 
-def JamfToDiskAll():
+def ScriptsJamfToDiskAll():
     # Syncs ALL scripts from Jamf to Disk
 
     # Load all scripts from Jamf
@@ -103,32 +111,37 @@ def JamfToDiskAll():
     # Save all scripts to Disk
     dsls.save(sl)
 
-print("""
-    Examples loaded into environment!
-      
-    Set the following environment variables to use:
-        JAMF_SERVER
-        JAMF_USERNAME
-        JAMF_PASSWORD
-      
-    Example Variables loaded:
-        api     - Jamf API facade object.  This is what interfaces with the Jamf API and returns objects we can handle
-        disk    - Disk facade object.  This is what interfaces with local files and returns objects we can handle
-      
-        dss     - Disk Script Strategy.  Main interaction with scripts on disk
-        jss     - Jamf Script Strategy.  Main interaction with scripts in Jamf
-        dsls    - Disk ScriptList Strategy.  Main interaction with a list of scripts on disk
-        jsls    - Jamf ScriptList Strategy.  Main interaction with a list of scripts in Jamf
-      
-        des     - Disk EA Strategy
-        jes     - Jamf EA Strategy
-        dels    - Disk EA List Strategy
-        jels    - Jamf EA List Strategy
-    
-    Example Functions available:
-        JamfToDiskSingleFile(search):
-        DiskToJamfSingleFile(search):
-        DiskToJamfAll():
-        JamfToDiskAll():
-      
-    """)
+def help():
+    print("""
+        Examples loaded into environment!
+        
+        Set the following environment variables to use:
+            JAMF_SERVER
+            JAMF_USERNAME
+            JAMF_PASSWORD
+        
+        Example Variables loaded:
+            api     - Jamf API facade object.  This is what interfaces with the Jamf API and returns objects we can handle
+            disk    - Disk facade object.  This is what interfaces with local files and returns objects we can handle
+        
+            dss     - Disk Script Strategy.  Main interaction with scripts on disk
+            jss     - Jamf Script Strategy.  Main interaction with scripts in Jamf
+            dsls    - Disk ScriptList Strategy.  Main interaction with a list of scripts on disk
+            jsls    - Jamf ScriptList Strategy.  Main interaction with a list of scripts in Jamf
+        
+            des     - Disk EA Strategy
+            jes     - Jamf EA Strategy
+            dels    - Disk EA List Strategy
+            jels    - Jamf EA List Strategy
+        
+        Example Functions available:
+            ScriptsJamfToDiskSingleFile(search):
+            ScriptsDiskToJamfSingleFile(search):
+            ScriptsDiskToJamfAll():
+            ScriptsJamfToDiskAll():
+          
+        Type `help()` to see this message again!
+        
+        """)
+
+help()

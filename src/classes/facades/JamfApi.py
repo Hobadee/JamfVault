@@ -179,6 +179,32 @@ class JamfApi:
     # Extension Attribute Functions
     #
 
+    def getEaList(self, EaType: str) -> EaList:
+        """
+        Gets a list of Extension Attributes
+        Figures out if we want Computer, Mobile, or User EAs based on passed variable
+
+        This is a lazy-loader
+
+        Args:
+            EaType (str): Type of EA - "computer", "mobile", or "user"
+        
+        Returns:
+            ExtensionAttributeList: ExtensionAttribute list object
+        """
+
+        match EaType:
+            case "computer":
+                return self.getCeaList()
+            case "mobile":
+                return self.getMeaList()
+            case "user":
+                return self.getMeaList()
+            case _:
+                raise ValueError(f"Unknown EA type: {EaType}")
+        raise RuntimeError("Something went very wrong.  We shouldn't be here.")
+
+    
     def getCeaList(self) -> EaList:
         """
         Gets a list of Computer Extension Attributes
