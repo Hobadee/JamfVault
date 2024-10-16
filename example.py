@@ -18,18 +18,21 @@ if "JAMF_SERVER" in os.environ:
     server = os.environ["JAMF_SERVER"]
     print("JAMF_SERVER loaded from environment variable")
 else:
+    print("JAMF_SERVER environment variable missing - reading from stdin")
     server = input("Jamf Server: ")
 
 if "JAMF_USERNAME" in os.environ:
     username = os.environ["JAMF_USERNAME"]
     print("JAMF_USERNAME loaded from environment variable")
 else:
+    print("JAMF_USERNAME environment variable missing - reading from stdin")
     username = input("Jamf Username: ")
 
 if "JAMF_PASSWORD" in os.environ:
     password = os.environ["JAMF_PASSWORD"]
     print("JAMF_PASSWORD loaded from environment variable")
 else:
+    print("JAMF_PASSWORD environment variable missing - reading from stdin")
     password = input("Jamf Password: ")
 
 # This is for setting the folder for the "Disk" strategy to use
@@ -42,6 +45,21 @@ api = JamfApi(JAC)
 
 # Create a disk connection.  You will need to give this to the Strategy
 disk = Disk(path=diskdir)
+
+#
+# Strategies
+#
+# We use the Strategy Pattern to interact with a low-level Facade class and return a type
+# of object such as a script, EA, or other representation of a Jamf setting/object.  The
+# Strategy Pattern lets us chose where we are loading from or to, such as a specific Jamf
+# connection or location on disk.
+#
+# The strategy itself doesn't know the low-level commands to load/save objects, but it
+# has some abstract knowledge of the underlying Facade classes that do.  The strategies
+# provide an easy and uniform way of dealing with the underlying classes without worrying
+# about their implementation - simple "load" and "save" methods that return well-known
+# classes
+#
 
 # Set up the Script strategies
 # We use these to work with individual scripts
@@ -60,8 +78,9 @@ jes = StrategyFactory.EaStrategy("jamf", api=api)
 
 # Set up the EA List strategies
 # TODO: Finish EaListStrategy
-#dels = StrategyFactory.EaListStrategy("disk", disk=disk)
-#jels = StrategyFactory.EaListStrategy("jamf", api=api, type="")
+# Types: "computer", "mobile", "user"
+#dels = StrategyFactory.EaListStrategy("disk", disk=disk, type="Computer")
+jels = StrategyFactory.EaListStrategy("jamf", api=api, EaType="computer")
 
 
 # These are all examples of how to do various basic sync's.
@@ -114,25 +133,22 @@ def ScriptsJamfToDiskAll():
 def help():
     print("""
         Examples loaded into environment!
-        
-        Set the following environment variables to use:
-            JAMF_SERVER
-            JAMF_USERNAME
-            JAMF_PASSWORD
+
+        I recommend you also read the source-code of the "example.py" file as the comments describe a lot of what's going on
         
         Example Variables loaded:
             api     - Jamf API facade object.  This is what interfaces with the Jamf API and returns objects we can handle
             disk    - Disk facade object.  This is what interfaces with local files and returns objects we can handle
         
-            dss     - Disk Script Strategy.  Main interaction with scripts on disk
-            jss     - Jamf Script Strategy.  Main interaction with scripts in Jamf
+            dss     - Disk Script Strategy.  Main interaction with a script on disk
+            jss     - Jamf Script Strategy.  Main interaction with a script in Jamf
             dsls    - Disk ScriptList Strategy.  Main interaction with a list of scripts on disk
             jsls    - Jamf ScriptList Strategy.  Main interaction with a list of scripts in Jamf
         
-            des     - Disk EA Strategy
-            jes     - Jamf EA Strategy
-            dels    - Disk EA List Strategy
-            jels    - Jamf EA List Strategy
+            des     - Disk EA Strategy.  Main interaction with an EA on disk
+            jes     - Jamf EA Strategy.  Main interaction with an EA in Jamf
+            dels    - Disk EA List Strategy.  Main interaction with a list of EAs on disk (Computer EA type)
+            jels    - Jamf EA List Strategy.  Main interaction with a list of EAs in Jamf (Computer EA type)
         
         Example Functions available:
             ScriptsJamfToDiskSingleFile(search):

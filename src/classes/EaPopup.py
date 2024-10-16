@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-class EaPopups:
+class EaPopup:
     """
     I'm not entirely sure I want this as it's own class right now.
 
@@ -11,4 +11,4 @@ class EaPopups:
         self._choices = []
 
     def addChoice(self, choice):
-        seaf._choices.push(choice)
+        self._choices.append(choice)

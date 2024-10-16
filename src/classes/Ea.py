@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.factories.EaPopupFactory import EaPopupFactory
+
 class Ea:
     """
     
@@ -48,7 +50,7 @@ class Ea:
         if "script" in json["input_type"]:
             self.inputScript = json["input_type"]["script"]
         if "popup_choices" in json["input_type"]:
-            self.popupMenu = ExtensionAttributePopupsFactory.fromJson(json["input_type"]["popup_choices"])
+            self.popupMenu = EaPopupFactory.fromJson(json["input_type"]["popup_choices"])
 
         self.loadStatus = "json"
 
