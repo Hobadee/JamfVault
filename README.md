@@ -76,6 +76,28 @@ Currently there is only very basic type-checking of the fields, so incorrect val
 Optionally, a matching Markdown (`.md`) file may be included with notes, todos, or other information about the script.  Currently, nothing is done with
 this file, but it is possible we do something with it in the future.  (We may decide to read this into the "Notes" field, for example.)
 
+### `ea/` subdirectory
+The `ea/` subdirectory will be used for sycing Extension Attributes.  There will be 3 additional subfolders here:
+- `computer/`
+- `mobile/`
+- `user/`
+
+EAs of each type will be placed in the respective folders.  That being said, the EA type will be designated by the JSON file, NOT the directory.
+
+Each EA will primarily be a JSON file with it's attributes.  Here is a minimal example:
+``` JSON
+{
+    "name": "Name of EA",
+    "enabled": "True",
+    "description": "",
+    "data_type": "String",
+    "input_type": "<script|popup|text>",
+    "inventory_display": "Extension Attributes"
+}
+```
+
+If the type is `script`, then a `.sh` or `.py` file with the same name will be searched for and included as the script contents.  A `.md` file with the same name may optionally be included as well, and will be included as the `description`.
+
 ### Other subdirectories
 As additional Jamf modules are included, subdirectories for each module will be added.
 

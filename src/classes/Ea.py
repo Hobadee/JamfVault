@@ -67,6 +67,9 @@ class Ea:
         json["input_type"]["type"] = self.inputType
         json["input_type"]["platform"] = self.inputPlatform
         json["input_type"]["script"] = self.inputScript
+
+        # TODO: We aren't handling popup-menu types properly here!
+        # ...we probably aren't handling other types properly either
         
         json["inventory_display"] = self.inventoryDisplay
 
